@@ -45,7 +45,16 @@ input[type=text] {
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  color: black!important;
 }
+input[type=email]{
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  color: black!important;
+} 
 h3{
     color: black!important;
 }

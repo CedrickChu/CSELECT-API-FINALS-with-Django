@@ -87,12 +87,12 @@
         cartItemsList.appendChild(newItem);
 
         // Update the total cart price
-        var totalCartPrice =cartTotalElement.textContent.replace('$', '') + productPrice;
-        cartTotalElement.textContent = '$' + totalCartPrice;
+        var totalCartPrice = parseFloat(cartTotalElement.textContent.replace('$', '')) + parseFloat(productPrice);
+        cartTotalElement.textContent = '$' + totalCartPrice.toFixed(2); // Display with two decimal places
     }
+    
 
     function removeFromCart(removeLink) {
-        // Send a request to remove the item from the cart
         var itemElement = removeLink.parentNode;
         var itemId = itemElement.dataset.itemId;
 
@@ -102,7 +102,6 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                // Remove the item from the UI
                 itemElement.remove();
             } else {
                 console.error('Error removing item from cart:', data.message);
@@ -111,7 +110,6 @@
         .catch(error => console.error('Error removing item from cart:', error));
     }
 
-    // Function to get the CSRF token from cookies
     function getCookie(name) {
         var cookieValue = null;
         if (document.cookie && document.cookie !== '') {

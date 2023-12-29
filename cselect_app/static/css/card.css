@@ -46,7 +46,6 @@ then set the desired styles for .card-img. */
   }
   
   .card-img .img::before {
-   /* delete */
     content: '';
     position: absolute;
     width: 60px;
@@ -63,7 +62,6 @@ then set the desired styles for .card-img. */
   }
   
   .card-img .img::after {
-   /* delete */
     content: '';
     position: absolute;
     box-sizing: border-box;

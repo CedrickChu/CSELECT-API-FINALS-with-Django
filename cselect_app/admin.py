@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import NewUser, CartItem, Status, Order, OrderDetail, Product, Cart
+from .models import NewUser, CartItem, Status, Order, OrderDetail, Product, Cart, UserProfile
 
 
 class CustomUserAdmin(UserAdmin):
@@ -67,3 +67,7 @@ class CartItemInline(admin.TabularInline):
 class CartAdmin(admin.ModelAdmin):
     list_display = ('user', 'id')
     inlines = [CartItemInline]
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'address', 'city', 'country', 'postal_code', 'about_me', 'profile_image')

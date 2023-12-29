@@ -34,10 +34,14 @@
 html{
     scroll-behavior: smooth;
 }
-body{
-    font-family: 'General Sans', sans-serif;
-    background-color: var(--clr-dark)!important;
-    color: var(--clr-light)!important;
+body {
+    background: #67B26F; 
+    background: -webkit-linear-gradient(to right, #4ca2cd, #67B26F); 
+    background: linear-gradient(to right, #4ca2cd, #67B26F); 
+    padding: 0;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    color: #000;
 }
 body.light-mode{
     --clr-light: #111827;

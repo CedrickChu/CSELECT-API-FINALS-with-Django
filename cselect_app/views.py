@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, CheckoutForm
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, CheckoutForm, CustomUserCreationForm, UserAndProfileForm, UserProfileForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
@@ -18,6 +18,8 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from django.contrib.auth.views import LogoutView
 from django.http import HttpResponseRedirect
+from django.views.generic import ListView, DetailView
+
 
 from django.http import Http404
 from .serializers import (
@@ -71,15 +73,25 @@ def home_view(request):
 
 def register_view(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+        user_form = CustomUserCreationForm(request.POST)
+        profile_form = UserProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            # Log the user in
             login(request, user, backend='django.contrib.auth.custom_auth_backend.CustomAuthBackend')
             messages.success(request, 'Registration successful. You are now logged in.')
-            return redirect('dashboard') 
+            return redirect('dashboard')
     else:
-        form = CustomUserCreationForm()
-    return render(request, 'register.html', {'form': form})
+        user_form = CustomUserCreationForm()
+        profile_form = UserProfileForm()
+
+    return render(request, 'register.html', {'user_form': user_form, 'profile_form': profile_form})
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'
@@ -175,6 +187,7 @@ def add_to_cart(request, item_id):
         return JsonResponse({'status': 'success', 'message': 'Item added to cart'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+        
 
 def remove_from_cart(request, item_id):
     cart = get_object_or_404(Cart, user=request.user)
@@ -232,63 +245,28 @@ class CartItemViewSet(viewsets.ModelViewSet):
             return CartItemCreateUpdateSerializer
         return CartItemSerializer
 
-class UserDetailView(RetrieveAPIView):
-    queryset = NewUser.objects.all()
-    serializer_class = NewUserSerializer
+@login_required
+def update_profile(request):
+    user_profile = request.user.userprofile
 
-class StatusDetailView(RetrieveAPIView):
-    queryset = Status.objects.all()
-    serializer_class = StatusSerializer
+    if request.method == 'POST':
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # AJAX form submission
+            form = UserAndProfileForm(request.POST, request.FILES, instance=user_profile)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({"success": True, "message": "Profile updated successfully"})
+            else:
+                return JsonResponse({"success": False, "message": "Error updating profile", "errors": form.errors})
+        else:
+            # Regular form submission
+            form = UserAndProfileForm(request.POST, request.FILES, instance=user_profile)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({"success": True, "message": "Profile updated successfully"})
+            else:
+                # Form is not valid, render the template with the form and errors
+                return render(request, 'profile.html', {'form': form})
 
-class ProductDetailView(RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-class OrderDetailView(RetrieveAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-class CartItemDetailView(RetrieveAPIView):
-    queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
-    
-class ProductListView(ListAPIView):
-    serializer_class = ProductSerializer
-
-    def get_queryset(self):
-        queryset = Product.objects.all()
-        name = self.request.query_params.get('name', None)
-        if name is not None:
-            queryset = queryset.filter(product_name=name)
-        return queryset
-    
-class OrderListView(ListAPIView):
-    serializer_class = OrderSerializer
-    def get_queryset(self):
-        queryset = Order.objects.all()
-        email = self.request.query_params.get('email', None)
-        if email is not None:
-            queryset = queryset.filter(user__email=email)
-        return queryset
-    
-class NewUserListView(ListAPIView):
-    serializer_class = NewUserSerializer
-
-    def get_queryset(self):
-        queryset = NewUser.objects.all()
-        email = self.request.query_params.get('email', None)
-        if email is not None:
-            queryset = queryset.filter(email=email)
-        return queryset
-
-class CartItemListView(ListAPIView):
-    serializer_class = CartItemSerializer
-
-    def get_queryset(self):
-        queryset = CartItem.objects.all()
-        email = self.request.query_params.get('email', None)
-        if email is not None:
-            queryset = queryset.filter(cart__user__email=email)
-        return queryset
-
-    
+    form = UserAndProfileForm(instance=user_profile)
+    return render(request, 'profile.html', {'form': form})

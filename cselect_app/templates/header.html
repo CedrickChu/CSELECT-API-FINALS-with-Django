@@ -1,19 +1,17 @@
 <header>
-    <div id="logo">CSELECT E-COMMERCE</div>
-
+    <div id="logo">Cedrick Chu Store</div>
     <div id="cd-hamburger-menu"><a class="cd-img-replace" href="#0">Menu</a></div>
     <div id="cd-cart-trigger"><a class="cd-img-replace" href="#0">Cart</a></div>
 </header>
 <nav id="main-nav">
     <ul>
-        <li><a href="{% url 'dashboard' %}">Home</a></li>
-        <li><a href="#0">About Us</a></li>
-        <li><a class="current" href="#0">Services</a></li>
+        <li><a href="{% url 'dashboard' %}">Store</a></li>
         <li>
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type="submit" style="background:none!important; border:none; padding:0!important; font-family:inherit; font-size:inherit; color:#E5E7EB;">Log Out</button>
             </form>
         </li>
+        <li><a href="{% url 'update_profile'%}">Profile</a></li>
     </ul>
 </nav>

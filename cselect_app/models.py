@@ -72,6 +72,21 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return self.is_staff
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(NewUser, on_delete=models.CASCADE, primary_key=True)
+    first_name = models.CharField(max_length=150, blank=True, null=True)
+    last_name = models.CharField(max_length=150, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=150, blank=True, null=True)
+    country = models.CharField(max_length=150, blank=True, null=True)
+    postal_code = models.IntegerField(blank=True, null=True)
+    about_me = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_images', blank=True, null=True)
+
+
+    def __str__(self):
+        return self.user.username
+    
 class Status(models.Model):
     status_name = models.CharField(max_length=50, unique=True)
 
