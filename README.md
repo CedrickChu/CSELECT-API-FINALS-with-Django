@@ -1,4 +1,4 @@
-ADD custom_auth_backend.py inside your env/lib/site-packages/django/contrib/auth/custom_auth_backend.py
+ADD custom_auth_backend.py 
 
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
